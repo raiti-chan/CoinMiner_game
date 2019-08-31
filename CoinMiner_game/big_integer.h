@@ -4,7 +4,7 @@
 
 
 namespace lib {
-
+	
 	using double_value = struct _double_value {
 		unsigned char l : 4;
 		unsigned char r : 4;
@@ -25,7 +25,7 @@ namespace lib {
 
 		big_integer() noexcept;
 
-
+		void _inc_or_dec(bool is_inc);
 
 	public:
 
@@ -45,29 +45,35 @@ namespace lib {
 		big_integer(unsigned long long value) noexcept;
 		big_integer(long long value) noexcept;
 
-		big_integer& operator = (const big_integer& value) noexcept;
-		big_integer& operator = (big_integer&& value) noexcept;
+		big_integer& operator =(const big_integer& value) noexcept;
+		big_integer& operator =(big_integer&& value) noexcept;
+
+		big_integer operator ++(int) noexcept;
+		big_integer operator --(int) noexcept;
+
+		big_integer& operator ++() noexcept;
+		big_integer& operator --() noexcept;
+
+		big_integer operator -() const noexcept;
+		big_integer operator +() const noexcept;
 
 		static big_integer to_big_integer(const char* str);
+		
+		static unsigned int to_value_index(const unsigned int index) { return index / 2; }
+		static unsigned int to_value_index(const unsigned int index, unsigned char& mod) {
+			mod = index & 0x1;
+			return index / 2;
+		}
 
-		big_integer operator++(int) noexcept;
-		big_integer operator--(int) noexcept;
+		friend bool operator <(const big_integer& v1, const big_integer& v2) noexcept;
+		friend inline bool operator >(const big_integer& v1, const big_integer& v2) noexcept { return v2 < v1; }
+		friend inline bool operator <=(const big_integer& v1, const big_integer& v2) noexcept { return !(v1 > v2); }
+		friend inline bool operator >=(const big_integer& v1, const big_integer& v2) noexcept { return !(v1 < v2); }
 
-		big_integer& operator++() noexcept;
-		big_integer& operator--() noexcept;
+		friend bool operator ==(const big_integer& v1, const big_integer& v2) noexcept;
+		friend inline bool operator !=(const big_integer& v1, const big_integer& v2) noexcept { return !(v1 == v2); }
 
-		big_integer operator-() const noexcept;
-		big_integer operator+() const noexcept;
-
-		friend bool operator < (const big_integer& v1, const big_integer& v2) noexcept;
-		friend inline bool operator > (const big_integer& v1, const big_integer& v2) noexcept { return v2 < v1; }
-		friend inline bool operator <= (const big_integer& v1, const big_integer& v2) noexcept { return !(v1 > v2); }
-		friend inline bool operator >= (const big_integer& v1, const big_integer& v2) noexcept { return !(v1 < v2); }
-
-		friend bool operator == (const big_integer& v1, const big_integer& v2) noexcept;
-		friend inline bool operator != (const big_integer& v1, const big_integer& v2) noexcept { return !(v1 == v2); }
-
-		friend std::ostream& operator << (std::ostream& os, const big_integer& value) noexcept;
+		friend std::ostream& operator <<(std::ostream& os, const big_integer& value) noexcept;
 
 	};
 

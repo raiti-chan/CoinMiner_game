@@ -84,7 +84,7 @@ namespace lib {
 	}
 
 
-	big_integer& big_integer::operator = (const big_integer& value) noexcept {
+	big_integer& big_integer::operator =(const big_integer& value) noexcept {
 		if (this->_values != nullptr) {
 			//std::cout << "delete : " << std::hex << this->_values << "\n";
 			delete this->_values;
@@ -96,7 +96,7 @@ namespace lib {
 		return *this;
 	}
 
-	big_integer& big_integer::operator = (big_integer&& value) noexcept {
+	big_integer& big_integer::operator =(big_integer&& value) noexcept {
 		if (this->_values != nullptr) {
 			//std::cout << "delete : " << std::hex << this->_values << "\n";
 			delete this->_values;
@@ -107,6 +107,39 @@ namespace lib {
 		this->_neg_sign = value._neg_sign;
 		this->_digit_count = value._digit_count;
 		return *this;
+	}
+
+
+	big_integer big_integer::operator ++(int) noexcept {
+		big_integer r(*this);
+		++(*this);
+		return r;
+	}
+
+	big_integer big_integer::operator --(int) noexcept {
+		big_integer r(*this);
+		--(*this);
+		return r;
+	}
+
+	big_integer& big_integer::operator ++() noexcept {
+		this->_inc_or_dec(true);
+		return *this;
+	}
+
+	big_integer& big_integer::operator --() noexcept {
+		this->_inc_or_dec(false);
+		return *this;
+	}
+
+	big_integer big_integer::operator -() const noexcept {
+		big_integer r(*this);
+		r._neg_sign = true;
+		return r;
+	}
+
+	big_integer big_integer::operator +() const noexcept {
+		return big_integer(*this);
 	}
 
 
@@ -146,93 +179,14 @@ namespace lib {
 		return bi;
 	}
 
-	big_integer big_integer::operator++(int) noexcept {
-		big_integer r(*this);
-		++(*this);
-		return r;
-	}
-
-	big_integer big_integer::operator--(int) noexcept {
-		big_integer r(*this);
-		--(*this);
-		return r;
-	}
-
-	big_integer& big_integer::operator++() noexcept {
-		if (this->_digit_count == 0) {
-			this->_digit_count = 1;
-			this->_neg_sign = false;
-			this->_values->resize(1);
-			(*this->_values)[0].dv.l = 1;
-			return *this;
-		}
-		if (!this->_neg_sign) {
-			(*this->_values)[0].dv.l++;
-			int i = 0;
-			int digit = 1;
-			while ((*this->_values)[i].dv.l > 9) {
-				(*this->_values)[i].dv.l -= 10;
-				(*this->_values)[i].dv.r++;
-				digit++;
-				if (this->_digit_count < digit) this->_digit_count++;
-				if ((*this->_values)[i].dv.r > 9) {
-					(*this->_values)[i].dv.r -= 10;
-
-					if (this->_values->size() < i + 1 + 1) {
-						this->_values->push_back(double_value_uc {1});
-						this->_digit_count++;
-						break;
-					}
-					i++;
-					(*this->_values)[i].dv.l++;
-					digit++;
-					if (this->_digit_count < digit) this->_digit_count++;
-				} else {
-					break;
-				}
-			}
-			/*if ((*this->_values)[0].dv.l > 9) {
-				(*this->_values)[0].dv.l -= 10;
-				(*this->_values)[0].dv.r++;
-				if (this->_digit_count < 2) this->_digit_count++;
-				int i = 1;
-				while ((*this->_values)[i].dv.l > 9) {
-
-				}
-
-			}*/
-		}
-		return *this;
-	}
-
-	big_integer& big_integer::operator--() noexcept {
-		if (this->_digit_count == 0) {
-			this->_digit_count = 1;
-			this->_neg_sign = true;
-			this->_values->resize(1);
-			(*this->_values)[0].dv.l = 1;
-			return *this;
-		}
-		return *this;
-	}
-
-	big_integer big_integer::operator-() const noexcept {
-		big_integer r(*this);
-		r._neg_sign = true;
-		return r;
-	}
-
-	big_integer big_integer::operator+() const noexcept {
-		return big_integer(*this);
-	}
 
 	bool operator == (const big_integer& v1, const big_integer& v2) noexcept {
 		if (v1._digit_count == 0 && v2._digit_count == 0) return true;
 		if (v1._neg_sign != v2._neg_sign) return false;
 		if (v1._digit_count != v2._digit_count) return false;
-		int size_v1 = v1._values->size();
-		int size_v2 = v2._values->size();
-		int& max_count = size_v1 < size_v2 ? size_v1 : size_v2;
+		std::size_t size_v1 = v1._values->size();
+		std::size_t size_v2 = v2._values->size();
+		std::size_t& max_count = size_v1 < size_v2 ? size_v1 : size_v2;
 		for (int i = 0; i < max_count; i++) {
 			if ((*v1._values)[i].value != (*v2._values)[i].value) return false;
 		}
@@ -253,7 +207,7 @@ namespace lib {
 			if (v1._digit_count > v2._digit_count) {
 				return false;
 			}
-			for (int i = v1._values->size() - 1; i >= 0; i--) {
+			for (long long i = static_cast<long long>(v1._values->size()) - 1; i >= 0; i--) {
 				if ((*v1._values)[i].value < (*v2._values)[i].value) {
 					return true;
 				}
@@ -268,7 +222,7 @@ namespace lib {
 			if (v1._digit_count < v2._digit_count) {
 				return false;
 			}
-			for (int i = v1._values->size() - 1; i >= 0; i--) {
+			for (long long i = static_cast<long long>(v1._values->size()) - 1; i >= 0; i--) {
 				if ((*v1._values)[i].value > (*v2._values)[i].value) {
 					return true;
 				}
@@ -300,4 +254,74 @@ namespace lib {
 		}
 		return os;
 	}
+
+
+
+	// private
+
+	void big_integer::_inc_or_dec(bool is_inc) {
+		if (this->_digit_count == 0) {
+			this->_digit_count = 1;
+			this->_neg_sign = !is_inc;
+			this->_values->resize(1);
+			(*this->_values)[0].dv.l = 1;
+			return;
+		}
+
+		if (this->_neg_sign == is_inc) {
+			if (this->_digit_count == 1 && (*this->_values)[0].dv.l == 1) {
+				this->_digit_count = 0;
+				this->_neg_sign = false;
+				return;
+			}
+			unsigned int digit = 0;
+			for (auto& value : *this->_values) {
+				digit++;
+				if (value.dv.l > 0) {
+					value.dv.l--;
+					if (digit == this->_digit_count && value.dv.l == 0) {
+						this->_digit_count--;
+					}
+					break;
+				}
+				value.dv.l = 9;
+
+				digit++;
+				if (value.dv.r > 0) {
+					value.dv.r--;
+					if (digit == this->_digit_count && value.dv.r == 0) {
+						this->_digit_count--;
+					}
+					break;
+				}
+				value.dv.r = 9;
+			}
+			return;
+		}
+
+		unsigned int digit = 0;
+		int inc_flug = 0;
+		for (auto& value : *this->_values) {
+			inc_flug = 0;
+
+			value.dv.l++;
+			digit++;
+			if (value.dv.l <= 9) break;
+			value.dv.l -= 10;
+
+			value.dv.r++;
+			digit++;
+			if (value.dv.r <= 9) break;
+			value.dv.r -= 10;
+			inc_flug = 1;
+		}
+		if (inc_flug) {
+			this->_values->push_back(double_value_uc{ 1 });
+			digit++;
+		}
+
+		if (this->_digit_count < digit) this->_digit_count = digit;
+		return;
+	}
+
 }

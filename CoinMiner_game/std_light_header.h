@@ -1,6 +1,7 @@
 #pragma once
 
 namespace std {
+	
 	template <class _Elem> struct char_traits;
 	template <class _Elem, class _Traits> class basic_ostream;
 	using ostream = std::basic_ostream<char, std::char_traits<char>>;

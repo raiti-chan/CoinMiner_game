@@ -23,7 +23,7 @@
     <ProjectGuid>{0E44C202-BCA3-4651-B6AB-9DD19625B4F0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CoinMinergame</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

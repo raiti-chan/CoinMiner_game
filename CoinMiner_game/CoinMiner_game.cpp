@@ -8,11 +8,12 @@
 
 using namespace lib::literal;
 int main() {
-	lib::big_integer bi(0);
-	unsigned long long l = 0;
+	lib::big_integer bi = -10000;
+	long long l = -10000;
 	while (bi == l) {
-		//std::cout << ++bi << ", ";
-		bi++;
-		l++;
+		std::cout << bi << "\n";
+		++bi;
+		++l;
 	}
+	
 }
